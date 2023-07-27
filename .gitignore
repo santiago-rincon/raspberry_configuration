@@ -1,0 +1,5 @@
+.obsidian
+.vscode
+__pycache__
+modules/__pycache__
+modules/__pycache__/*
