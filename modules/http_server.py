@@ -48,4 +48,4 @@ def run_server(port):
     except KeyboardInterrupt:
         pass
     httpd.server_close()
-    print("Servidor detenido.")
+    print("\nSaliendo...\n")
