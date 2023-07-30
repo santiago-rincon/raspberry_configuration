@@ -1,7 +1,7 @@
 - [x] Crear servidor que suba los datos mediante Python
 - [x] Identificar nodo mediante base de datos
 - [x] CRUD en la base de datos desde Firebase a la local
-- [ ] Interfaz gráfica vinculado con la base de datos de manera bidireccional
+- [x] Interfaz gráfica vinculado con la base de datos de manera bidireccional
 - [x] Actualizar base de datos al recibir un cambio
 - [ ] Enviar alerta por SMS cuando el umbral sea superado
 - [ ] Establecer la Raspberry en modo router

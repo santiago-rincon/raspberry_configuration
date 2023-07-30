@@ -24,6 +24,7 @@ longitude_node = DoubleVar()
 variable = StringVar()
 threshold = DoubleVar()
 interval = IntVar()
+unity_interval = StringVar()
 
 # Inputs
 text_id_nodo = Label(frame, text="ID:").grid(row=0, column=0, padx=8)
@@ -56,6 +57,10 @@ text_interval = Label(frame_variables, text="Periodo de muestreo:").grid(row=0, 
 input_interval = Entry(frame_variables, textvariable=interval)
 input_interval.grid(row=0, column=3)
 
+input_interval_unity = ttk.Combobox(frame_variables, values=["Minutos", "Horas"], textvariable=unity_interval, state='readonly')
+input_interval_unity.grid(row=0, column=4, padx=8)
+input_interval_unity.current(0)
+
 mensage = Label(frame, text=" ", fg="green")
 mensage.grid(row=1, column=0, columnspan=10, pady=10)
 
@@ -63,7 +68,7 @@ mensage_variables = Label(frame_variables, text=" ", fg="green")
 mensage_variables.grid(row=1, column=0, columnspan=2, pady=10)
 
 mensage_intervals = Label(frame_variables, text=" ", fg="green")
-mensage_intervals.grid(row=1, column=2, columnspan=2, pady=10)
+mensage_intervals.grid(row=1, column=2, columnspan=3, pady=10)
 
 # Función del evento
 def select_node(event):
@@ -124,28 +129,34 @@ main_table.heading("Longitud", text="Longitud", anchor=CENTER)
 main_table.heading("ID firebase", text="ID firebase", anchor=CENTER)
 main_table.bind("<<TreeviewSelect>>", select_node)
 
-# Table intervals
+# Table variables
 table_variables = ttk.Treeview(frame_variables, height=5)
 table_variables.grid(row=2, column=0, columnspan=2, pady=10)
-table_variables['columns'] = ("Variable", "Umbral de alerta")
+table_variables['columns'] = ("Variable", "Umbral de alerta", "Unidad", "Name Firebase")
 table_variables.column("#0", width=0, stretch=NO)
 table_variables.column("Variable", anchor=CENTER, width=120)
 table_variables.column("Umbral de alerta", anchor=CENTER, width=120)
+table_variables.column("Unidad", anchor=CENTER, width=120)
+table_variables.column("Name Firebase", width=0, stretch=NO)
 #Encabezados variables
 table_variables.heading("#0", text="", anchor=CENTER)
 table_variables.heading("Variable", text="Variable", anchor=CENTER)
 table_variables.heading("Umbral de alerta", text="Umbral de alerta", anchor=CENTER)
+table_variables.heading("Unidad", text="Unidad", anchor=CENTER)
+table_variables.heading("Name Firebase", text="Name Firebase", anchor=CENTER)
 table_variables.bind("<<TreeviewSelect>>", select_variable)
 
-# Table variables
+# Table intervarls
 table_intervals = ttk.Treeview(frame_variables, height=1)
-table_intervals.grid(row=2, column=2, columnspan=2, pady=10)
-table_intervals['columns'] = ("Periodo de muestreo",)
+table_intervals.grid(row=2, column=2, columnspan=3, pady=10)
+table_intervals['columns'] = ("Periodo de muestreo", "Unidad")
 table_intervals.column("#0", width=0, stretch=NO)
 table_intervals.column("Periodo de muestreo", anchor=CENTER, width=120)
-#Encabezados variables
+table_intervals.column("Unidad", anchor=CENTER, width=120)
+#Encabezados intervals
 table_intervals.heading("#0", text="", anchor=CENTER)
 table_intervals.heading("Periodo de muestreo", text="Periodo de muestreo", anchor=CENTER)
+table_intervals.heading("Unidad", text="Unidad", anchor=CENTER)
 table_intervals.bind("<<TreeviewSelect>>", select_interval)
 
 # Buttons
@@ -171,7 +182,7 @@ button_update_interval = Button(frame_variables, text="Actualizar periodo", comm
 button_update_interval.grid(row=3, column=2, pady=10)
 
 button_refresh_interval = Button(frame_variables, text="Refrescar", command=lambda: refresh_interval())
-button_refresh_interval.grid(row=3, column=3, pady=10)
+button_refresh_interval.grid(row=3, column=4, pady=10)
 
 # Functions
 def clear_table():
@@ -203,6 +214,7 @@ def clear_inputs():
     longitude_node.set(0)
     threshold.set(0)
     interval.set(0)
+    unity_interval.set("Minutos")
 
 def validation_inputs(state_inputs):
     message_errors = {
@@ -250,8 +262,15 @@ def get_variables():
         "rad": "Radiación solar",
         "co2": "Dioxio de carbono" 
     }
+    unity_of_variables = {
+        "temp" : "°C",
+        "ha" : "%",
+        "hs" : "%",
+        "rad": "\u03BCmol/s\u00B7m\u00B2",
+        "co2": "ppm"
+    }
     for variable in variables:
-        table_variables.insert("", END, values=(name_of_variables[variable[0]], variable[1]))
+        table_variables.insert("", END, values=(name_of_variables[variable[0]], variable[1], unity_of_variables[variable[0]], variable[0]))
     button_refresh['bg'] = '#f0f0f0'
 
 def get_intervals():
@@ -259,7 +278,7 @@ def get_intervals():
     database  = Database()
     interval = database.get_local_intervals()
     database.close()
-    table_intervals.insert("", END, values=(interval))
+    table_intervals.insert("", END, values=(interval, "Minutos"))
     button_refresh['bg'] = '#f0f0f0'
 
 def refresh_table():
@@ -356,6 +375,7 @@ def update_node():
             id = main_table.item(main_table.focus())['values'][5]
             database  = Database()
             previous_data_tuple = database.get_local_node(id)
+            database.close()
             previous_data = {
                 "mac": previous_data_tuple[0].lower(),
                 "nodeId": previous_data_tuple[1],
@@ -373,13 +393,6 @@ def update_node():
             if previous_data != data_to_firebase:
                 validation = validation_procces("UPDATE")
                 if validation[0]:
-                    data_to_firebase = {
-                        "mac": mac_node.get().lower(),
-                        "nodeStatus": True if status_node.get() == "Activo" else False,
-                        "latitude": latitude_node.get(),
-                        "longitude": longitude_node.get(),
-                        "nodeId": id_node.get()
-                    }
                     status = firebase.update_node(id, data_to_firebase)
                     if status:
                         mensage["text"] = "Se ha actualizado el nodo correctamente"
@@ -389,7 +402,7 @@ def update_node():
                         button_refresh['bg'] = 'yellow'
                         get_node()
                     else:
-                        mensage["text"] = "Ha ocurrido un error al actualizar el nodo, intente de nuevoe"
+                        mensage["text"] = "Ha ocurrido un error al actualizar el nodo, intente de nuevo"
                         mensage["fg"] = "red"
                 else:
                     mensage["text"] = validation[1]
@@ -404,10 +417,75 @@ def update_node():
         print(str(e))
 
 def update_umbral():
-    pass
+    try:
+        selected_item = table_variables.focus()
+        if selected_item:
+            variable = table_variables.item(table_variables.focus())['values'][3]
+            database  = Database()
+            previous_data_tuple = database.get_local_thresholds(variable)
+            database.close()
+            name_of_variables_firebase = {
+                "temp" : "Temperatura",
+                "ha" : "Humedad",
+                "hs" : "HumedadS",
+                "rad": "Rad",
+                "co2": "CO2" 
+            }
+            previous_data = {
+                name_of_variables_firebase[variable]: previous_data_tuple[1]
+            }
+            data_to_firebase = {
+                name_of_variables_firebase[variable]: threshold.get()
+            }
+            if previous_data != data_to_firebase:
+                status = firebase.update_thresholds(data_to_firebase)
+                if status:
+                    mensage_variables["text"] = "Se ha actualizado el umbral de alerta correctamente"
+                    mensage_variables["fg"] = "green"
+                    time.sleep(2)
+                    clear_inputs()
+                    button_refresh['bg'] = 'yellow'
+                    get_variables()
+                else:
+                    mensage_variables["text"] = "Ha ocurrido un error al actualizar el umbral, intente de nuevo"
+                    mensage_variables["fg"] = "red"
+            else:
+                mensage_variables["text"] = "Modifica el umbral de alerta"
+                mensage_variables["fg"] = "red"
+        else:
+            mensage_variables["text"] = "Seleccione una variable para actualizar su umbral!!"
+            mensage_variables["fg"] = "red"
+    except Exception as e:
+        print(str(e))
 
 def update_interval():
-    pass
+    try:
+        database  = Database()
+        previous_data_tuple = database.get_local_intervals()
+        database.close()
+        previous_data = {
+            "minutes": previous_data_tuple
+        }
+        data_to_firebase = {
+            "minutes": interval.get() if unity_interval.get() == "Minutos" else interval.get()*60
+        }
+        if previous_data != data_to_firebase:
+            status = firebase.update_interval(data_to_firebase)
+            if status:
+                mensage_intervals["text"] = "Se ha actualizado el periodo de muestreo correctamente"
+                mensage_intervals["fg"] = "green"
+                time.sleep(2)
+                clear_inputs()
+                button_refresh['bg'] = 'yellow'
+                get_intervals()
+            else:
+                mensage_intervals["text"] = "Ha ocurrido un error al actualizar el periodo de muestreo, intente de nuevo"
+                mensage_intervals["fg"] = "red"
+        else:
+            mensage_intervals["text"] = "Modifica el periodo de muestreo"
+            mensage_intervals["fg"] = "red"
+    except Exception as e:
+        print(str(e))
 
 
 try:

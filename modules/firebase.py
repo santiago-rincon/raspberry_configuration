@@ -82,6 +82,28 @@ def update_node(id, data):
     except Exception as e:
         print(f"Error al actualizar el documento: {e}")
         return False
+    
+def update_thresholds(data):
+    db = firestore.client()
+    try:
+        # Actualizar el documento
+        db.collection('Umbrales').document('yB1NAzpx0V3m5BfLzuEJ').update(data)
+        print(f"Documento actualizado correctamente.")
+        return True
+    except Exception as e:
+        print(f"Error al actualizar el documento: {e}")
+        return False
+    
+def update_interval(data):
+    db = firestore.client()
+    try:
+        # Actualizar el documento
+        db.collection('Umbrales/yB1NAzpx0V3m5BfLzuEJ/interval').document('JDf2iPPdtiHy2jQkoRqs').update(data)
+        print(f"Documento actualizado correctamente.")
+        return True
+    except Exception as e:
+        print(f"Error al actualizar el documento: {e}")
+        return False
 
 def start_listeners():
     db = firestore.client()
@@ -114,7 +136,7 @@ def _nodes_changes(col_snapshot, changes, read_time):
 def _thresholds(col_snapshot, changes, read_time):
     print("Cambio en la colección de umbrales")
     for change in changes:
-        if change.type.name == "MODIFIED":
+        if change.type.name == "MODIFIED" or change.type.name == "ADDED":
             database = Database()
             new_threshold = change.document.to_dict()
             database.update_thresholds(new_threshold)
@@ -123,7 +145,7 @@ def _thresholds(col_snapshot, changes, read_time):
 def _intervals(col_snapshot, changes, read_time):
     print("Cambio en la colección de intervalos")
     for change in changes:
-        if change.type.name == "MODIFIED":
+        if change.type.name == "MODIFIED" or change.type.name == "ADDED":
             database = Database()
             new_interval = change.document.to_dict()
             database.update_intervals(new_interval["minutes"])

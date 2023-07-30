@@ -147,3 +147,13 @@ class Database:
         except Exception as e:
             print("Error: ",str(e))
             return None
+        
+    def get_local_thresholds(self, variable):
+        query = f"SELECT * FROM thresholds WHERE variable = '{variable}';"
+        try:
+            self.cursor.execute(query)
+            thresholds = self.cursor.fetchone()
+            return thresholds
+        except Exception as e:
+            print("Error: ",str(e))
+            return None
