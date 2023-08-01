@@ -6,16 +6,18 @@ from modules.database import *
 import modules.firebase as firebase
 import time
 import re
+from datetime import datetime
+import pytz
 # Funciones
 
 window = Tk()
 window.title("Gestión de nodos sensores")
-window.geometry("1040x650")
+window.geometry("1320x660")
 
 frame=LabelFrame(window, text="Gestión de nodos sensores", padx=20, pady=20)
-frame.place(x=10,y=10,width=1020,height=330)
+frame.place(x=10,y=10,width=1300,height=330)
 frame_variables=LabelFrame(window, text="Gestión de umbrales y periodos de muestreo", padx=20, pady=20)
-frame_variables.place(x=10,y=350,width=1020,height=290)
+frame_variables.place(x=10,y=350,width=1300,height=290)
 
 #Variables
 id_node = IntVar()
@@ -71,6 +73,9 @@ mensage_variables.grid(row=1, column=0, columnspan=2, pady=5)
 
 mensage_intervals = Label(frame_variables, text=" ", fg="green")
 mensage_intervals.grid(row=1, column=2, columnspan=3, pady=5)
+
+mensage_last_measures = Label(frame_variables, text="Últimas medidas registradas", fg="black", font=("Helvetica", 10, "bold"))
+mensage_last_measures.grid(row=0, column=5, pady=5)
 
 # Función del evento
 def select_node(event):
@@ -158,6 +163,22 @@ table_intervals.heading("Periodo de muestreo", text="Periodo de muestreo", ancho
 table_intervals.heading("Unidad", text="Unidad", anchor=CENTER)
 table_intervals.bind("<<TreeviewSelect>>", select_interval)
 
+# Table last_measures
+table_last_measures = ttk.Treeview(frame_variables, height=5)
+table_last_measures.grid(row=2, column=5, pady=10)
+table_last_measures['columns'] = ("Variable", "Medida", "Fecha", "Hora")
+table_last_measures.column("#0", width=0, stretch=NO)
+table_last_measures.column("Variable", anchor=CENTER, width=170)
+table_last_measures.column("Medida", anchor=CENTER, width=120)
+table_last_measures.column("Fecha", anchor=CENTER, width=120)
+table_last_measures.column("Hora", anchor=CENTER, width=120)
+#Encabezados last_measures
+table_last_measures.heading("#0", text="", anchor=CENTER)
+table_last_measures.heading("Variable", text="Variable", anchor=CENTER)
+table_last_measures.heading("Medida", text="Medida", anchor=CENTER)
+table_last_measures.heading("Fecha", text="Fecha", anchor=CENTER)
+table_last_measures.heading("Hora", text="Hora", anchor=CENTER)
+
 # Buttons
 button_add = Button(frame, text="Añadir nodo", command=lambda: add_node())
 button_add.grid(row=3, column=1, columnspan=1, pady=10)
@@ -183,6 +204,9 @@ button_update_interval.grid(row=3, column=2, pady=10)
 button_refresh_interval = Button(frame_variables, text="Refrescar", command=lambda: refresh_interval())
 button_refresh_interval.grid(row=3, column=4, pady=10)
 
+button_refresh_last_measures = Button(frame_variables, text="Refrescar", command=lambda: refresh_last_measures())
+button_refresh_last_measures.grid(row=3, column=5, pady=10)
+
 # Functions
 def clear_table():
     try:
@@ -202,6 +226,13 @@ def clear_table_intervals():
     try:
         for row in table_intervals.get_children():
             table_intervals.delete(row)
+    except Exception as e:
+        print(str(e))
+
+def clear_table_last_measures():
+    try:
+        for row in table_last_measures.get_children():
+            table_last_measures.delete(row)
     except Exception as e:
         print(str(e))
 
@@ -280,6 +311,33 @@ def get_intervals():
     table_intervals.insert("", END, values=(interval, "Minutos"))
     button_refresh['bg'] = '#f0f0f0'
 
+def get_last_measures():
+    clear_table_last_measures()
+    last_measure = firebase.get_last_measures()
+    variables = {
+        "Temperatura" : "Temperatura",
+        "HumedadA" : "Humedad ambiente",
+        "HumedadS" : "Humedad suelo",
+        "CO2" : "Dioxio de carbono",
+        "Rad" : "Radiación solar",
+    }
+    unity_of_variables = {
+        "Temperatura" : "°C",
+        "HumedadA" : "%",
+        "HumedadS" : "%",
+        "Rad": "\u03BCmol/s\u00B7m\u00B2",
+        "CO2": "ppm"
+    }
+    time_zone_colombia = pytz.timezone('America/Bogota')
+    for measure in last_measure:
+        measure_with_unity = f'{measure["measure"]} {unity_of_variables[measure["variable"]]}'
+        utc = measure["dateAndTime"].astimezone(pytz.utc)
+        date = utc.astimezone(time_zone_colombia)
+        date = date.strftime("%d-%m-%Y")
+        time = utc.astimezone(time_zone_colombia)
+        time = time.strftime("%I:%M %p")
+        table_last_measures.insert("", END, values=(variables[measure["variable"]], measure_with_unity, date, time))
+
 def refresh_table():
     get_node()
     clear_inputs()
@@ -294,6 +352,10 @@ def refresh_interval():
     get_intervals()
     clear_inputs()
     mensage_intervals["text"] = ''
+
+def refresh_last_measures():
+    get_last_measures()
+    clear_inputs()
 
 def validation_procces(proccess):
     database  = Database()
@@ -495,6 +557,7 @@ try:
     get_node()
     get_variables()
     get_intervals()
+    get_last_measures()
     window.mainloop()
 except KeyboardInterrupt:
     print("\nSaliendo...\n")

@@ -104,6 +104,21 @@ def update_interval(data):
     except Exception as e:
         print(f"Error al actualizar el documento: {e}")
         return False
+    
+def get_last_measures():
+    db = firestore.client()
+    try:
+        collections = ["Temperatura", "HumedadA", "HumedadS", "CO2", "Rad"]
+        measures = []
+        for collection in collections:
+            # Obtener el Último dato de la colección
+            last_measure = db.collection(collection).order_by('dateAndTime', direction=firestore.Query.DESCENDING).limit(1).get()[0].to_dict()
+            last_measure["variable"]= collection
+            measures.append(last_measure)
+        return measures
+    except Exception as e:
+        print(f"Error al obtener el Último dato de la colección: {e}")
+        return None
 
 def start_listeners():
     db = firestore.client()

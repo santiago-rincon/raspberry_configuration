@@ -3,7 +3,7 @@ import mysql.connector as mariadb
 class Database:
     def __init__(self):
         self.connection = mariadb.connect(
-            host='192.168.1.3', 
+            host='192.168.1.7', 
             user='raspberry', 
             password='raspberry', 
             database='nodos'

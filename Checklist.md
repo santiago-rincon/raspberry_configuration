@@ -38,3 +38,30 @@ curl -X POST -H "Content-Type: application/json" -d '{"name": "Juan", "age": 30}
 ```bash
 curl -X POST -H "Content-Type: application/json" -d '{"mac": "ae:58:ff:d5:c1:55", "temp":25.6, "ha":50.36, "hs": 72.98, "rad":150.25, "co2":600}' http://192.168.1.7:8080
 ```
+
+## Instalación de firebase admin
+
+```bash
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+```
+
+```bash
+sudo apt-get install build-essential libssl-dev libffi-dev python3-dev cargo pkg-config
+```
+
+```python
+pip install cryptography --upgrade
+```
+
+## Configuración de mariadb
+
+```bash
+sudo mysql_secure_installation
+```
+
+```sql
+CREATE DATABASE <dbname>;
+CREATE USER '<username>'@'localhost' IDENTIFIED BY '<password>';
+GRANT ALL PRIVILEGES ON <dbname>.* TO '<username>'@'localhost';
+FLUSH PRIVILEGES;
+```
