@@ -12,12 +12,12 @@ import pytz
 
 window = Tk()
 window.title("Gestión de nodos sensores")
-window.geometry("1320x660")
+window.geometry("1340x660")
 
 frame=LabelFrame(window, text="Gestión de nodos sensores", padx=20, pady=20)
-frame.place(x=10,y=10,width=1300,height=330)
+frame.place(x=10,y=10,width=1320,height=330)
 frame_variables=LabelFrame(window, text="Gestión de umbrales y periodos de muestreo", padx=20, pady=20)
-frame_variables.place(x=10,y=350,width=1300,height=290)
+frame_variables.place(x=10,y=350,width=1320,height=290)
 
 #Variables
 id_node = IntVar()
@@ -75,7 +75,7 @@ mensage_intervals = Label(frame_variables, text=" ", fg="green")
 mensage_intervals.grid(row=1, column=2, columnspan=3, pady=5)
 
 mensage_last_measures = Label(frame_variables, text="Últimas medidas registradas", fg="black", font=("Helvetica", 10, "bold"))
-mensage_last_measures.grid(row=0, column=5, pady=5)
+mensage_last_measures.grid(row=0, column=5, pady=5, padx=1)
 
 # Función del evento
 def select_node(event):
@@ -156,7 +156,7 @@ table_intervals.grid(row=2, column=2, columnspan=3, pady=10)
 table_intervals['columns'] = ("Periodo de muestreo", "Unidad")
 table_intervals.column("#0", width=0, stretch=NO)
 table_intervals.column("Periodo de muestreo", anchor=CENTER, width=170)
-table_intervals.column("Unidad", anchor=CENTER, width=120)
+table_intervals.column("Unidad", anchor=CENTER, width=100)
 #Encabezados intervals
 table_intervals.heading("#0", text="", anchor=CENTER)
 table_intervals.heading("Periodo de muestreo", text="Periodo de muestreo", anchor=CENTER)
@@ -168,10 +168,10 @@ table_last_measures = ttk.Treeview(frame_variables, height=5)
 table_last_measures.grid(row=2, column=5, pady=10)
 table_last_measures['columns'] = ("Variable", "Medida", "Fecha", "Hora")
 table_last_measures.column("#0", width=0, stretch=NO)
-table_last_measures.column("Variable", anchor=CENTER, width=170)
+table_last_measures.column("Variable", anchor=CENTER, width=150)
 table_last_measures.column("Medida", anchor=CENTER, width=120)
-table_last_measures.column("Fecha", anchor=CENTER, width=120)
-table_last_measures.column("Hora", anchor=CENTER, width=120)
+table_last_measures.column("Fecha", anchor=CENTER, width=100)
+table_last_measures.column("Hora", anchor=CENTER, width=100)
 #Encabezados last_measures
 table_last_measures.heading("#0", text="", anchor=CENTER)
 table_last_measures.heading("Variable", text="Variable", anchor=CENTER)

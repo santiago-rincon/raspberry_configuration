@@ -1,0 +1,1 @@
+@reboot /home/raspberry/Desktop/Coffee_Proyect/start_services.sh

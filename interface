@@ -1,0 +1,4 @@
+#!/bin/bash
+
+cd /home/raspberry/Desktop/Coffee_Proyect
+python3 interface_raspberry.py
