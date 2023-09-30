@@ -1,4 +1,4 @@
 #!/bin/bash
 
-cd /home/raspberry/Desktop/Coffee_Proyect
+cd $HOME/Desktop/Proyecto/services
 python3 interface_raspberry.py

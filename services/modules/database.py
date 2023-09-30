@@ -3,10 +3,10 @@ import mysql.connector as mariadb
 class Database:
     def __init__(self):
         self.connection = mariadb.connect(
-            host='192.168.1.7', 
+            host='localhost', 
             user='raspberry', 
             password='raspberry', 
-            database='nodos'
+            database='proyecto'
         )
         self.cursor = self.connection.cursor()
 
