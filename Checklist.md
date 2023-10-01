@@ -4,7 +4,7 @@
 - [x] Interfaz gráfica vinculado con la base de datos de manera bidireccional
 - [x] Actualizar base de datos al recibir un cambio
 - [ ] Enviar alerta por SMS cuando el umbral sea superado
-- [ ] Establecer la Raspberry en modo router
+- [x] Establecer la Raspberry en modo router
 - [ ] Usar la interfaz GSM para salida a internet
 - [ ] Enviar pulso por el transector
 ## Credenciales sistema
@@ -63,22 +63,37 @@ sudo apt install mariadb-server
 pip install pytz firebase_admin mysql-connector-python
 ```
 ## Configuración de mariadb
-
+1. Instalación segura
 ```bash
 sudo mysql_secure_installation
 ```
 
+2. Creación de la base de datos
 ```sql
 CREATE DATABASE <dbname>;
-CREATE USER '<username>'@'localhost' IDENTIFIED BY '<password>';
-GRANT ALL PRIVILEGES ON <dbname>.* TO '<username>'@'localhost';
+CREATE USER '<username>'@'%' IDENTIFIED BY '<password>';
+GRANT ALL PRIVILEGES ON <dbname>.* TO '<username>'@'%';
 FLUSH PRIVILEGES;
 ```
+- **dbname:** proyecto
+- **username:** raspberry
+- **password:** raspberry
 
+3. Importación de las tablas a la base de datos.
 ```bash
 mariadb <usuername> -p <dbmane> < nodos.sql
 ```
 
+4. Habilitar el servicio SQL en la red local (Reemplazar 127.0.0.1 por 0.0.0.0)
+```bash
+sudo nano /etc/mysql/mariadb.conf.d/50-server.cnf
+```
+
+5. Actualizar permisos del usuario (si se creo erroneamente)
+```mysql
+RENAME USER '<username>'@'localhost' TO '<username>'@'%';
+FLUSH PRIVILEGES;
+```
 ## Configuración del modo router ([raspAP](https://raspap.com/))
 
 1. Actualización del sistema 
