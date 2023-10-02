@@ -96,6 +96,16 @@ class Database:
             print("Error: ",str(e))
             return None
 
+    def get_threshold(self,variable):
+        query = f"SELECT umbral FROM thresholds WHERE variable = '{variable}';"
+        try:
+            self.cursor.execute(query)
+            threshold = self.cursor.fetchone()
+            return threshold[0]
+        except Exception as e:
+            print("Error: ",str(e))
+            return None
+
 # --------- Methods used to interact with Local --> Firebase ---------
 
     def get_local_nodes(self):

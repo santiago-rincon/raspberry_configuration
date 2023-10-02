@@ -4,6 +4,8 @@ from firebase_admin import credentials
 from firebase_admin import firestore
 from datetime import datetime, timezone
 from modules.database import Database
+from modules.twilio import send_message
+from modules.crontab import update_cron
 
 def init_firebase():
     # Inicialización la aplicación de Firebase con archivo de credenciales
@@ -40,6 +42,10 @@ def send_data(mac, data):
                 try:
                     db.collection(collection).document().set(data_to_firebase)
                     print('Datos subidos correctamente')
+                    umbral = database.get_threshold(key)
+                    if value > umbral:
+                        message_dict = {"temp" : "temperatura", "ha": "humedad ambiente", "hs": "humedad del suelo", "co2": "dióxido de carbono (co2)", "rad": "radiación solar"}
+                        send_message(f'El nodo "{node_id}" con MAC "{mac}" ha superado el umbral de {message_dict[key]} a {value}')
                     report.append((key, True))
                 except Exception as e:
                     print("Error:", str(e))
@@ -164,4 +170,16 @@ def _intervals(col_snapshot, changes, read_time):
             database = Database()
             new_interval = change.document.to_dict()
             database.update_intervals(new_interval["minutes"])
+            sintax_cron = make_crontab(new_interval["minutes"])
+            update_cron(sintax_cron)
             database.close()
+
+def make_crontab(minutes):
+    if minutes == 1:
+        return "* * * * *"
+    elif minutes > 1 and minutes < 60:
+        return f"*/{minutes} * * * *"
+    elif minutes >= 60 and minutes < 1440:
+        hours = minutes // 60
+        minutes_remainder = minutes % 60
+        return f"*/{minutes_remainder} */{hours} * * *" if minutes_remainder > 0 else f"* */{hours} * * *"

@@ -1,1 +1,2 @@
 @reboot $HOME/Desktop/Proyecto/scripts/start_services.sh
+* * * * * python3 $HOME/Desktop/Proyecto/services/enable_esp.py

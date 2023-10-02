@@ -3,7 +3,7 @@
 - [x] CRUD en la base de datos desde Firebase a la local
 - [x] Interfaz gráfica vinculado con la base de datos de manera bidireccional
 - [x] Actualizar base de datos al recibir un cambio
-- [ ] Enviar alerta por SMS cuando el umbral sea superado
+- [x] Enviar alerta por SMS cuando el umbral sea superado
 - [x] Establecer la Raspberry en modo router
 - [ ] Usar la interfaz GSM para salida a internet
 - [ ] Enviar pulso por el transector
@@ -60,7 +60,7 @@ sudo apt install mariadb-server
 ### Librerías de Python
 
 ```python
-pip install pytz firebase_admin mysql-connector-python
+pip install pytz firebase_admin mysql-connector-python twilio python-crontab
 ```
 ## Configuración de mariadb
 1. Instalación segura
