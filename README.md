@@ -103,11 +103,13 @@ Para comunicar la Raspberry con el módulo HC12 se hace necesario configurar los
 sudo nano /boot/config.txt
 ```
 y agregar en la última línea `dtoverlay=uart5`. Además a través de `sudo raspi-config` se debe habilitar el puerto serie de la siguiente manera:
+
 ![A](assets/serial1.png)
 ![A](assets/serial2.png)
 ![A](assets/serial3.png)
 ![A](assets/serial4.png)
 ![A](assets/serial5.png)
+
 Posteriormente la Raspberry se reiniciará y estará disponible los pines 32 y 33 en la UART5 como TX y RX respectivamente a través de `/dev/ttyAMA1`.
 ## Configuración de tareas Cron y otros Scripts
 Para que las tareas Cron funcionen el proyecto se debe encontrar en una carpeta llamada `Proyecto` en el escritorio del usuario con bajos privilegios.
