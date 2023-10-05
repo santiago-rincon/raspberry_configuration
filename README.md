@@ -99,9 +99,11 @@ Cambio del usuario y contraseña para acceder al panel administrativo
 ![A](assets/raspAP6.png)
 ## Configuración del UART5 de la Raspberry
 Para comunicar la Raspberry con el módulo HC12 se hace necesario configurar los pines  32 y 33 en la UART5 como TX y RX respectivamente, para ello se debe editar el siguiente fichero:
+
 ```bash
 sudo nano /boot/config.txt
 ```
+
 y agregar en la última línea `dtoverlay=uart5`. Además a través de `sudo raspi-config` se debe habilitar el puerto serie de la siguiente manera:
 
 ![A](assets/serial1.png)
@@ -110,7 +112,9 @@ y agregar en la última línea `dtoverlay=uart5`. Además a través de `sudo ras
 ![A](assets/serial4.png)
 ![A](assets/serial5.png)
 
-Posteriormente la Raspberry se reiniciará y estará disponible los pines 32 y 33 en la UART5 como TX y RX respectivamente a través de `/dev/ttyAMA1`.
+Posteriormente la Raspberry se reiniciará y estará disponible los pines **32** y **33** (ver imágen) en la UART5 como TX y RX respectivamente a través de `/dev/ttyAMA1`.
+
+![pinout](assets/pinout.png)
 ## Configuración de tareas Cron y otros Scripts
 Para que las tareas Cron funcionen el proyecto se debe encontrar en una carpeta llamada `Proyecto` en el escritorio del usuario con bajos privilegios.
 1. Se debe añadir dos tareas cron con el comando
