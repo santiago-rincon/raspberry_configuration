@@ -129,14 +129,13 @@ chmod +x $HOME/Desktop/Proyecto/scripts/start_services.sh
 
 # Cambio de algunos parámetros en los scripts
 - **Cambio de puerto del servidor:** para cambiar el puerto del servidor http basta con editar la línea **6** del archivo `server.py` ubicado en la carpeta `services/server.py`. Por defecto el servidor está en el puerto 8080. 
-- **Cambio de número telefónico para el envío de alertas:** para cambiar el número al cual se envían las alertas vía SMS basta con editar la línea **11** del archivo `twilio.py` ubicado en la carpeta `services/modules/twilio.py`. En dicha línea se debe colocar en un `string` el número telefónico al que se desea enviar el SMS sin olvidar el prefijo +57. Antes de añadir un nuevo número debe ser verificad por la plataforma de Twilio. Para añadir un nuevo número debe ingresar ingresar a la [Consola de Twilio](https://console.twilio.com/) e iniciar sesión. Una vez adentro debe ir al siguiente apartado
+- **Cambio de número telefónico para el envío de alertas:** el script encargado del envío de alertas por defecto envía el SMS a todos los números verificados agregados en la [Consola de Twilio](https://console.twilio.com/). Por ende, si se desea añadir o quitar un número basta con realizar la acción pertinente en la plataforma de Twilio como se muestra en las siguientes imágenes. 
 
 ![](assets/twilio.png)
 
-Debe dar clic en `add new Caller ID` y escribir el nuevo número telefónico, el servicio de Twilio enviará un mensaje de texto con un código que debe ser ingresado en la plataforma para verificar que sea un número activo.
-
+Debe dar clic en `add new Caller ID` y escribir el nuevo número telefónico teniendo en cuenta el prefijo del pais (el apartado de extensión se puede dejar en blanco), el servicio de Twilio enviará un mensaje de texto con un código que debe ser ingresado en la plataforma para verificar que sea un número activo.
 # Algunas consideraciones
-La estructura que debe recibir el servidor http por el método POST debe contener la cabecera `Content-Type: application/json` y la siguiente información (únicamente la `mac` es obgatoria, las demás son opcionales):
+La estructura que debe recibir el servidor http por el método POST debe contener la cabecera `Content-Type: application/json` y la siguiente información (únicamente la `mac` es obligatoria, los demás campos son opcionales):
 
 ```typescript
 {
